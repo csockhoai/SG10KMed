@@ -50,3 +50,4 @@ count(distinct(PLP_indv.count))
 PLP_dem <- left_join(dem, PLP_indv.count)
 PLP_dem.ancestry <- PLP_dem %>% group_by(genetic_ethnicity) %>% filter(n >0) %>% count()
 PLP_dem.ancestry
+

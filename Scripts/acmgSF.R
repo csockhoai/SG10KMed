@@ -414,3 +414,5 @@ PLP_AD_varcount.acmg59 <- PLP_AD_varcount %>% filter(gene_symbol %in% acmg73$Gen
 PLP_AD_varcount.acmg73_only <- PLP_AD_varcount %>% filter(gene_symbol %in% acmg73$Gene[acmg73$Inheritance == "AD" & acmg73$Version == 3] & !(hgvs_c %in% apoblof$hgvs_c))
 
 
+
+
