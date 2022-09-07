@@ -18,13 +18,13 @@ dem <- read.table("Full_Sample_Info_9051_edit_v2.txt", header = TRUE, sep = "\t"
 PLP_indv <- read.table("All_Tier1_Pathogenic_Variants_r5.3_20211117.txt", header = TRUE, sep = "\t")
 
 # =================================================================
-# Section 01: Cohort distribution - genetic sex, genetic ancestry
+# Section 1.0 : Cohort distribution - genetic sex, genetic ancestry
 #==================================================================
 # summarizing cohort-level distribution by genetic ancestry and genetic sex
 dem %>% group_by(genetic_ethnicity, genetic_sex) %>% count()
 
 # =================================================================
-# Section 02: Cohort distribution - age
+# Section 2.0 : Cohort distribution - age
 #==================================================================
 # summarizing age distribution (median, range[min-max]) of overall cohort
 dem_overall <- dem %>% replace(is.na(.), 0) %>% summarise(
@@ -73,7 +73,7 @@ lines(density(dem_ancestry_1$age[which(dem_ancestry_1$genetic_ethnicity == "I")]
 lines(density(dem_ancestry_1$age[which(dem_ancestry_1$genetic_ethnicity == "M")]), col = "blue", add = T)
 
 # =================================================================
-# Section 03: P/LP variant distribution by genetic ancestry 
+# Section 3.0 : P/LP variant distribution by genetic ancestry 
 #==================================================================
 # list of individuals with pathogenic/likely pathogenic (P/LP) variants identified
 PLP_indv.count <- PLP_indv %>% group_by(npm_research_id) %>% count()
