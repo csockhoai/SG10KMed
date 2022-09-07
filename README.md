@@ -3,7 +3,7 @@ The code here is used for analysis of the dataset and generation of all figures 
 
 ## General requirements
 
-R 4.1.0 or above is required to run the code. Successful installation of the following R packages is required for execution of the code: tidyverse (1.3.1), RVAideMemoire (v 0.9-80), gplots (3.1.1), patchwork (1.1.1). Some older versions might also work.
+R 4.1.0 or above is required to run the code. Successful installation of the following R packages is required for execution of the code: tidyverse (1.3.1), RVAideMemoire (v 0.9-80), gplots (3.1.1), patchwork (1.1.1), janitor (2.1.0), data.table (1.14.0). Some older versions might also work.
 
 Each script is standalone and can be performed independently of other scripts in this repository. The data files required to run the code in each script is specified within the script.
 
