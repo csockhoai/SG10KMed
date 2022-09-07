@@ -1,21 +1,26 @@
 # This codes calculates the carrier frequency of pharmacophenotypes for 23 pharmacogenes with high confidence gene-drug interactions, allele frequencies and diplotype frequencies for genes with star allele nomenclature
 # Generated outcomes are displayed in :
-# a) Table 2, Supplementary Table 11 - frequency of pharmacophenotypes
-# b) Supplementary Table 12 - allele frequencies
-# c) Supplementary Table 15 - diplotype frequencies for genes with star nomenclature
+# a) Table 2 - frequency of pharmacophenotypes
+# b) Supplementary Data 6 - allele frequencies
+# c) Supplementary Data 11 - diplotype frequencies for genes with star nomenclature
 # Code block for each gene is repeated, please note that variables may be overwritten.
 
+# ===================================
+# Pre-01 : Load required packages
+# ===================================
 library(tidyverse)
 library(RVAideMemoire)
 
-# load main data file:
+# ================================
+# Pre-02 : Load main data files
+# ================================
 # individual-level basic demographic data
 indv <- read.table("r5.3_9105_UnrelatedSamples_Demographics_20211117.txt", header = TRUE, sep = "\t")
 
-
+# =========================================================
 # PGX Gene 1: CACNA1S
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CACNA1S_v2.csv", header = TRUE)
 df2 <- df1 %>% mutate(phenotype = case_when(df1$rs772226819 == 1 ~ "MHS",
@@ -84,11 +89,11 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# ================================================================================================
 # PGX Gene 2: CFTR
 # allele type: rsID, VCF-derived
 # individuals with at least 1 untyped genotype in any 1 of the 4 loci is considered "Untyped"
-
+# ================================================================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CFTR_v2.csv", header = TRUE)
 df2 <- c()
@@ -166,10 +171,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 3: CYP2B6
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP2B6_v1.csv", header = TRUE)
 tabl_alle <- read.csv("R_CYP2B6_v1_alleletable.csv", header = TRUE)
@@ -186,7 +191,7 @@ colnames(df2b) <- c('npm_research_id', 'Allele_1', 'Allele_2', 'Func_alle1', 'Fu
 df2b <- data.frame(df2b)
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 tabl_alle_phe <- tabl_alle %>% filter(Allele_function %in% c('Decreased_function', 'No_function', 'Increased_function'))
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -240,7 +245,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 df5_a <- df2b %>% unite("Diplotype", Allele_1:Allele_2, sep = "/", remove = FALSE) %>% select(npm_research_id, Diplotype, phenotype)
 diplo_1 <- left_join(indv, df5_a, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Ultrarapid_metabolizer", "Rapid_metabolizer", "Intermediate_metabolizer", "Poor_metabolizer"))
@@ -285,15 +290,15 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 4: CYP2C9
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP2C9_v1.csv", header = TRUE)
 df3 <- df1 %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 tabl_alle <- read.table("R_CYP2C9_alleletable.txt", header = TRUE, sep = "\t")
 tabl_alle_phe <- tabl_alle %>% filter(Allele_function %in% c('Decreased function', 'No function'))
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
@@ -349,7 +354,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df1, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Intermediate_metabolizer ", "Poor_metabolizer "))
 carriers_1 <- diplo_1 %>% filter(phenotype != "Untyped") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -393,17 +398,17 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 5: CYP2C19
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP2C19_v1.csv", header = TRUE)
 tabl_phe <- read.csv("R_CYP2C19_v1_phenotypetable.csv", header = TRUE)
 df2 <- df1 %>% left_join(tabl_phe, c("Diplotype_updated" = "Diplotype_CPIC"))
 df3 <- df2 %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 tabl_alle <- read.csv("R_CYP2C19_v1_alleletable.csv", header = TRUE)
 tabl_alle_phe <- tabl_alle %>% filter(Allele_function %in% c('Decreased function', 'No function', 'Increased function'))
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
@@ -459,7 +464,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df2, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype_updated, phenotype, genetic_ethnicity) %>% count(Diplotype_updated)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Intermediate_metabolizer", "Poor_metabolizer"))
 carriers_1 <- diplo_1 %>% filter(phenotype != "Untyped") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -503,10 +508,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 6: CYP2D6
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP2D6_v1.csv", header = TRUE)
 tabl_alle <- read.csv("R_CYP2D6_SGallele_v3_final.csv", header = TRUE)
@@ -520,7 +525,7 @@ df2b <- df2 %>% mutate(phenotype = case_when(phenotype_score > 2 ~ "Ultrarapid_m
                                              TRUE ~ "Indeterminate"))
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-#To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+#To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 tabl_alle_phe <- tabl_alle %>% filter(V1_ClinicalAnnotation %in% c('Decreased function', 'No function', 'Increased function'))
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 df4_a <- df2b %>% filter(phenotype != "Uncallable") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -574,7 +579,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df2b, by = "npm_research_id") %>% unite("Diplotype", Allele_1:Allele_2, sep = "/", remove = FALSE) %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Ultrarapid_metabolizer", "Intermediate_metabolizer", "Poor_metabolizer"))
 carriers_1 <- diplo_1 %>% filter(phenotype != "Uncallable") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -631,10 +636,10 @@ impm_df1_matrix <- as.matrix(impm_df1_matrix)
 fisher.test(impm_df1_matrix)
 fisher.multcomp(impm_df1_matrix, p.method = "BH")
 
-
+# =========================================================
 # PGX Gene 7: CYP3A4
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP3A4_v1.csv", header = TRUE)
 df2 <- df1 %>% mutate(phenotype = case_when(Diplotype == "*1/*1" ~ "Normal_metabolism",
@@ -643,7 +648,7 @@ df2 <- df1 %>% mutate(phenotype = case_when(Diplotype == "*1/*1" ~ "Normal_metab
                                             TRUE ~ "Unknown"))
 df3 <- df2 %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- read.csv("R_CYP3A4_v1_alleletable.csv", header = TRUE)
 df4_a <- df2 %>% filter(phenotype != "Untyped") %>% separate(Diplotype, into = c('Allele_1', 'Allele_2'), sep = "/") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -697,7 +702,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df2, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype == "Decreased_metabolism")
 carriers_1 <- diplo_1 %>% filter(phenotype != "Untyped") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -741,10 +746,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 8: CYP3A5
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP3A5_v1.csv", header = TRUE)
 df1[c("Allele_1", "Allele_2")][is.na(df1[c("Allele_1", "Allele_2")])] <- 0
@@ -763,7 +768,7 @@ colnames(df2b) <- c('npm_research_id', 'Diplotype', 'Allele_1', 'Allele_2', 'Fun
 df2b <- data.frame(df2b)
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- tabl_alle %>% filter(Allele_func == 'No_function')
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -817,7 +822,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df2b, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Normal_metabolizer", "Intermediate_metabolizer", "Poor_metabolizer"))
 carriers_1 <- diplo_1 %>% filter(phenotype != "Untyped") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -861,10 +866,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 9: CYP4F2
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_CYP4F2_v1.csv", header = TRUE)
 df2 <-
@@ -936,15 +941,15 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 10: DPYD
 # allele type: rsID/star allele (customized Aldy calling)
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_DPYD_v1.csv", header = TRUE)
 df3 <- df1 %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- read.csv("R_DPYD_deficientalleles.csv", header = TRUE)
 tabl_alle_phe_SG <- read.table("R_DPYD_deficientalleles_SG.txt", header = TRUE, sep = "\t")
@@ -1008,7 +1013,7 @@ df5_a <- df4_h %>% filter(Allele %in% tabl_alle_phe_SG$Allele)
 df5_b <- left_join(df5_a, alle_number_2, by = "genetic_ethnicity") %>% mutate(AF = AC/AN)
 df5_b
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df1, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Intermediate_metabolizer", "Poor_metabolizer"))
 carriers_1 <- diplo_1 %>% filter(phenotype != "Untyped") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -1052,10 +1057,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 11: F5
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_F5_v2.csv", header = TRUE)
 df2 <-
@@ -1125,10 +1130,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 12: G6PD
 # allele type: rsID, VCF-derived, WHO nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_G6PD_v1.csv", header = TRUE)
 tabl_alle <- read.csv("R_G6PD_v1_alleletable.csv", header = TRUE)
@@ -1148,7 +1153,7 @@ colnames(df2b) <- c('npm_research_id', 'Diplotype', 'Allele_1', 'Allele_2', 'WHO
 df2b <- data.frame(df2b)
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- tabl_alle_b %>% filter(WHO_class %in% c("II", "III", "III-IV"))
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -1270,10 +1275,10 @@ colnames(t1_c) <- c(colnames(t1a_b2)[1], colnames(t1a_b2[2:ncol(t1a_b2)]), colna
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 13: HLA-A
 # alleles called using HLA-HD
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_HLA-A_v1.csv", header = TRUE)
 
@@ -1297,7 +1302,7 @@ df2 <-
   )
 df3 <- df2 %>% select(npm_research_id, phenotype) 
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 df4_a <- df2 %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Def_alle_3101_score, phenotype)
 df4_b <- left_join(df4_a, indv, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% select(genetic_ethnicity, Def_alle_3101_score)
 df4_c <- data.frame()
@@ -1354,10 +1359,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 14: HLA-B
 # alleles called using HLA-HD
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_HLA-B_v1.csv", header = TRUE)
 
@@ -1378,16 +1383,22 @@ df2 <-
     Def_alle1_5801 = case_when(Allele_1 == "B*58:01" ~ 1, Allele_1 == "Not_typed:NA" ~ -99, TRUE ~ 0),
     Def_alle2_5801 = case_when(Allele_2 == "B*58:01" ~ 1, Allele_2 == "Not_typed:NA" ~ -99, TRUE ~ 0),
     Def_alle1_5701 = case_when(Allele_1 == "B*57:01" ~ 1, Allele_1 == "Not_typed:NA" ~ -99, TRUE ~ 0),
-    Def_alle2_5701 = case_when(Allele_2 == "B*57:01" ~ 1, Allele_2 == "Not_typed:NA" ~ -99, TRUE ~ 0),
-    Def_Balle_score = rowSums(across(where(is.numeric))),
-    phenotype = case_when(Def_Balle_score > 0 ~ "Increased_SCAR",
-                          Def_Balle_score == 0 ~ "WT",
-                          Def_Balle_score < 0 ~ "Untyped")
-  )
-df3 <- df2 %>% select(npm_research_id, phenotype) 
+    Def_alle2_5701 = case_when(Allele_2 == "B*57:01" ~ 1, Allele_2 == "Not_typed:NA" ~ -99, TRUE ~ 0))
+df2.2 <- df2 %>% rowwise() %>% mutate(Def_Balle_score_SCAR = sum(Def_alle1_1502, Def_alle2_1502, Def_alle1_5801, Def_alle2_5801),
+                                      Def_Balle_score_AHS = sum(Def_alle1_5701, Def_alle2_5701),
+                                      phenotype = case_when(Def_Balle_score_SCAR > 0 & Def_Balle_score_AHS > 0 ~ "Increased_SCAR_AHS",
+                                                            Def_Balle_score_SCAR > 0 & Def_Balle_score_AHS == 0 ~ "Increased_SCAR",
+                                                            Def_Balle_score_SCAR > 0 & Def_Balle_score_AHS < 0 ~ "Increased_SCAR",
+                                                            Def_Balle_score_SCAR == 0 & Def_Balle_score_AHS > 0 ~ "Increased_AHS",
+                                                            Def_Balle_score_SCAR == 0 & Def_Balle_score_AHS == 0 ~ "WT",
+                                                            Def_Balle_score_SCAR == 0 & Def_Balle_score_AHS < 0 ~ "WT",
+                                                            Def_Balle_score_SCAR < 0 & Def_Balle_score_AHS > 0 ~ "Increased_AHS",
+                                                            Def_Balle_score_SCAR < 0 & Def_Balle_score_AHS == 0 ~ "WT",
+                                                            Def_Balle_score_SCAR < 0 & Def_Balle_score_AHS < 0 ~ "Untyped"))
+df3 <- df2.2 %>% select(npm_research_id, phenotype) 
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
-df2b <- df2 %>% mutate(Def_1502 = (Def_alle1_1502 + Def_alle2_1502),
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
+df2b <- df2.2 %>% mutate(Def_1502 = (Def_alle1_1502 + Def_alle2_1502),
                        Def_5801 = (Def_alle1_5801 + Def_alle2_5801),
                        Def_5701 = (Def_alle1_5701 + Def_alle2_5701))
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Def_1502, Def_5801, Def_5701, phenotype)
@@ -1427,7 +1438,7 @@ t1a_b2$Untyped <- as.numeric(t1a_b2$Untyped)
 t1a_b2$total <- as.numeric(t1a_b2$total)
 t1a_b2$total_typed <- (t1a_b2$total - t1a_b2$Untyped)
 t1a_b2.T <- t(t1a_b2)
-t1a_b <- t1a_b2[, c(1:4,6)]
+t1a_b <- t1a_b2[, c(1:6,8)]
 # calculate fraction of each phenotype and combine into final table
 t1_c <- c()
 for(i in 1:nrow(t1a_b))
@@ -1446,10 +1457,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 15: IFNL3
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_IFNL3_v2.csv", header = TRUE)
 df2 <- c()
@@ -1471,7 +1482,7 @@ colnames(df2) <- c('npm_research_id', 'rs12979860', 'rs8099917', 'NAcount','phen
 df2 <- data.frame(df2)
 df3 <- df2[, c(1,5)]
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 df4_a <- df2 %>% select(npm_research_id, rs12979860, rs8099917, phenotype)
 df4_b <- left_join(df4_a, indv, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% select(genetic_ethnicity, rs12979860, rs8099917)
 df4_c <- data.frame()
@@ -1528,10 +1539,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 16: IFNL4
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_IFNL4_v2.csv", header = TRUE)
 df2 <- c()
@@ -1553,7 +1564,7 @@ colnames(df2) <- c('npm_research_id', 'rs12979860', 'rs11322783CT.C', 'NAcount',
 df2 <- data.frame(df2)
 df3 <- df2[, c(1,5)]
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 df4_a <- df2 %>% select(npm_research_id, rs12979860, rs11322783CT.C, phenotype)
 df4_b <- left_join(df4_a, indv, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% select(genetic_ethnicity, rs12979860, rs11322783CT.C)
 df4_c <- data.frame()
@@ -1610,10 +1621,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 17: NAT2
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_NAT2_v1.csv", header = TRUE)
 tabl_alle <- read.csv("R_NAT2_alleletable.csv", header = TRUE)
@@ -1631,7 +1642,7 @@ df2b <- df2 %>% mutate(phenotype = case_when((Func_alle1 == "rapid" & Func_alle2
                                              TRUE ~ "Untyped"))
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- tabl_alle %>% filter(Allele_func %in% c("rapid", "slow"))
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -1685,7 +1696,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo_1 <- left_join(indv, df2b, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype == "Slow_acetylator")
 carriers_1 <- diplo_1 %>% filter(phenotype != "Untyped") %>% group_by(genetic_ethnicity) %>% summarise(Carrier = sum(n))
@@ -1729,10 +1740,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 18: NUDT15
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_NUDT15_v2.csv", header = TRUE)
 df2 <- df1 %>% mutate(phenotype = case_when(df1$rs116855232 == 0 ~ "Normal_metabolizer",
@@ -1802,10 +1813,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 19: RYR1
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_RYR1_v2.csv", header = TRUE)
 df2 <- c()
@@ -1884,10 +1895,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 20: SLCO1B1
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_SLCO1B1_v2.csv", header = TRUE)
 df2 <- df1 %>% mutate(phenotype = case_when(df1$rs4149056 == 0 ~ "WT",
@@ -1957,10 +1968,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 21: TPMT
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_TPMT_v1.csv", header = TRUE)
 tabl_alle <- read.csv("R_TPMT_v1_alleletable.csv", header = TRUE)
@@ -1977,7 +1988,7 @@ colnames(df2b) <- c('npm_research_id', 'Allele_1', 'Allele_2', 'Func_alle1', 'Fu
 df2b <- data.frame(df2b)
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- tabl_alle %>% filter(Allele_Func == "No_function")
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -2031,7 +2042,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo <- df2b %>% unite("Diplotype", Allele_1:Allele_2, sep = "/", remove = FALSE)
 diplo_1 <- left_join(indv, diplo, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Intermediate_metabolizer", "Poor_metabolizer"))
@@ -2076,10 +2087,10 @@ colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames
 t1_c.T <- t(t1_c)
 t1_c.T
 
-
+# =========================================================
 # PGX Gene 22: UGT1A1
 # allele type: star nomenclature
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_UGT1A1_v1.csv", header = TRUE)
 tabl_alle <- read.csv("R_UGT1A1_alleletable.csv", header = TRUE)
@@ -2096,7 +2107,7 @@ colnames(df2b) <- c('npm_research_id', 'Allele_1', 'Allele_2', 'Func_alle1', 'Fu
 df2b <- data.frame(df2b)
 df3 <- df2b %>% select(npm_research_id, phenotype)
 
-# To calculate allele count, allele frequency and number of carriers (Supplementary Table 12)
+# To calculate allele count, allele frequency and number of carriers (Supplementary Data 6)
 dem <- indv %>% select(npm_research_id, genetic_sex, genetic_ethnicity)
 tabl_alle_phe <- tabl_alle %>% filter(Allele_Func %in% c("Decreased_function", "Increased_function"))
 df4_a <- df2b %>% filter(phenotype != "Untyped") %>% select(npm_research_id, Allele_1, Allele_2)
@@ -2150,7 +2161,7 @@ for(i in 2:ncol(df4_c))
 }
 df4_d
 
-# To summarize frequency by diplotype (Supplementary Table 15)
+# To summarize frequency by diplotype (Supplementary Data 11)
 diplo <- df2b %>% unite("Diplotype", Allele_1:Allele_2, sep = "/", remove = FALSE)
 diplo_1 <- left_join(indv, diplo, by = "npm_research_id") %>% filter(genetic_ethnicity %in% c("C", "I", "M")) %>% group_by(Diplotype, phenotype, genetic_ethnicity) %>% count(Diplotype)
 diplo_2 <- diplo_1 %>% filter(phenotype %in% c("Intermediate_metabolizer", "Poor_metabolizer"))
@@ -2214,16 +2225,16 @@ colnames(pm_df1) <- pm_df1[1,]
 pm_df1 <- pm_df1[-1,]
 pm_df1 <- as.data.frame(pm_df1)
 pm_df1[,1:3] <- lapply(pm_df1[,1:3], as.numeric)
-pm_df1_pm <- pm_df1[2,]
+pm_df1_pm <- pm_df1[1,]
 pm_df1_residual <- pm_df1[2,] - pm_df1[1,]
 pm_df1_matrix <- rbind.data.frame(pm_df1_pm, pm_df1_residual)
 pm_df1_matrix <- as.matrix(pm_df1_matrix)
 fisher.multcomp(pm_df1_matrix, p.method = "BH")
 
-
+# =========================================================
 # PGX Gene 23: VKORC1
 # allele type: rsID, VCF-derived
-
+# =========================================================
 # To consolidate genotypes/phenotypes for all individuals
 df1 <- read.csv("R_VKORC1_v2.csv", header = TRUE)
 df2 <- c()
@@ -2321,3 +2332,4 @@ for(i in 1:nrow(t1a_b))
 colnames(t1_c) <- c(colnames(t1a_b)[1], colnames(t1a_b[2:ncol(t1a_b)]), colnames(t1a_b[2:ncol(t1a_b)]))
 t1_c.T <- t(t1_c)
 t1_c.T
+
